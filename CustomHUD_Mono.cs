@@ -119,7 +119,7 @@ class CustomHUD_Mono : MonoBehaviour
         }
 
         float weightDisplay = Mathf.RoundToInt(Mathf.Clamp(player.carryWeight - 1f, 0.0f, 100f) * 105f);
-        if (Plugin.shouldDoKGConversion)
+        if (Plugin.convertToKG.Value)
         {
             weightDisplay *= 0.453592f;
             carryText.text = string.Format("{0}<size=60%>kg</size>", weightDisplay);

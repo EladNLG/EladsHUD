@@ -15,19 +15,18 @@ using UnityEngine.UIElements;
 namespace CustomHUD
 {
     [BepInPlugin("me.eladnlg.customhud", "Elads HUD", "1.1.0")]
-    [BepInDependency("com.zduniusz.lethalcompany.lbtokg", BepInDependency.DependencyFlags.SoftDependency)]
     public class Plugin : BaseUnityPlugin
     {
         public static Plugin instance;
         public AssetBundle assets;
         public GameObject HUD;
-        public static bool shouldDoKGConversion = false;
 
         internal static ConfigEntry<PocketFlashlightOptions> pocketedFlashlightDisplayMode;
         internal static ConfigEntry<StaminaTextOptions> detailedStamina;
         internal static ConfigEntry<bool> displayTimeLeft;
         internal static ConfigEntry<float> hudScale;
         internal static ConfigEntry<bool> autoHideHealthbar;
+        internal static ConfigEntry<bool> convertToKG;
         internal static ConfigEntry<float> healthbarHideDelay;
 
         private void Awake()
@@ -39,6 +38,7 @@ namespace CustomHUD
             // Plugin startup logic
             hudScale = Config.Bind("General", "HUDScale", 1f, "The size of the HUD.");
             autoHideHealthbar = Config.Bind("General", "HideHealthbarAutomatically", true, "Should the healthbar be hidden after not taking damage for a while.");
+            convertTtoKG = Config.Bind("General", "ConvertWeighttoKG", true, "Should the weight indicator show kilograms instead of pounds.");
             healthbarHideDelay = Config.Bind("General", "HealthbarHideDelay", 4f, "The amount of time before the healthbar starts fading away.");
             pocketedFlashlightDisplayMode = Config.Bind("General", "FlashlightBattery", PocketFlashlightOptions.Separate,
 @"How the flashlight battery is displayed whilst unequipped.
@@ -70,7 +70,6 @@ Full - Both percentage and rate of gain/loss will be displayed.");
             {
                 Logger.LogInfo("Plugin GUID: " + chain.Value.Metadata.GUID);
             }
-            shouldDoKGConversion = Chainloader.PluginInfos.Any(pair => pair.Value.Metadata.GUID == "com.zduniusz.lethalcompany.lbtokg");
         }
     }
 
