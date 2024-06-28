@@ -14,8 +14,7 @@ using UnityEngine.UIElements;
 
 namespace CustomHUD
 {
-    [BepInPlugin("me.eladnlg.customhud", "Elads HUD", "1.1.0")]
-    [BepInDependency("com.zduniusz.lethalcompany.lbtokg", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInPlugin("me.eladnlg.customhud", "Elads HUD", "1.2.3")]
     public class Plugin : BaseUnityPlugin
     {
         public static Plugin instance;
@@ -29,6 +28,7 @@ namespace CustomHUD
         internal static ConfigEntry<float> hudScale;
         internal static ConfigEntry<bool> autoHideHealthbar;
         internal static ConfigEntry<float> healthbarHideDelay;
+        internal static ConfigEntry<bool> hidePlanetInfo;
 
         private void Awake()
         {
@@ -51,6 +51,8 @@ Disabled - The stamina text will be hidden.
 PercentageOnly - Only the percentage will be displayed. (recommended)
 Full - Both percentage and rate of gain/loss will be displayed.");
             displayTimeLeft = Config.Bind("General", "DisplayTimeLeft", true, "Should the uses/time left for a battery-using item be displayed.");
+            hidePlanetInfo = Config.Bind("General", "HidePlanetInfo", false, "Should planet info be hidden. If modifying from an in-game menu, this requires you to rejoin the game.");
+
 
             Logger.LogInfo($"Plugin Elad's HUD is loaded!");
 
@@ -82,9 +84,19 @@ Full - Both percentage and rate of gain/loss will be displayed.");
         static void Awake_Postfix(HUDManager __instance)
         {
             HUDElement[] elements = __instance.GetPrivateField<HUDElement[]>("HUDElements");
-            elements[2].canvasGroup.alpha = 0;
-            GameObject HUD = Object.Instantiate(Plugin.instance.HUD, elements[2].canvasGroup.transform.parent);
-            HUD.transform.localScale = new Vector3(0.75f, 0.75f, 0.75f) * Plugin.hudScale.Value;
+            HUDElement topLeftCorner = elements[2];
+
+            GameObject HUD = Object.Instantiate(Plugin.instance.HUD, topLeftCorner.canvasGroup.transform.parent);
+            HUD.transform.localScale = Vector3.one * 0.75f * Plugin.hudScale.Value;
+
+            topLeftCorner.canvasGroup.alpha = 0;
+
+            // fix for planetary info not showing when landing
+            Transform cinematicGraphics = topLeftCorner.canvasGroup.transform.Find("CinematicGraphics");
+            if (cinematicGraphics != null && !Plugin.hidePlanetInfo.Value)
+            {
+                cinematicGraphics.SetParent(HUD.transform.parent);
+            }
             elements[2].canvasGroup = HUD.GetComponent<CanvasGroup>();
         }
     }

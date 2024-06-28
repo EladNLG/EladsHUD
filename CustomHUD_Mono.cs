@@ -25,6 +25,7 @@ class CustomHUD_Mono : MonoBehaviour
     public CanvasGroup healthGroup;
     public Image healthBar;
     public TextMeshProUGUI healthText;
+    public TextMeshProUGUI healthText2;
     [Header("Stamina")]
     public CanvasGroup staminaGroup;
     public Image staminaBar;
@@ -61,11 +62,15 @@ class CustomHUD_Mono : MonoBehaviour
     public void UpdateFromPlayer(PlayerControllerB player)
     {
         lastHealthChange += Time.deltaTime;
-        if (lastHealth != player.health)
+        // only show healthbar if we took damage
+        if (player.health < lastHealth)
         {
-            lastHealth = player.health;
+            Debug.Log("o shit");
+            Debug.Log(player.health);
+            Debug.Log(lastHealth);
             lastHealthChange = 0f;
         }
+        lastHealth = player.health;
         int health = player.health;
         float stamina = player.sprintMeter;
         float sprintTime = player.sprintTime;
@@ -93,7 +98,7 @@ class CustomHUD_Mono : MonoBehaviour
                 staminaBar.fillAmount = stamina - Mathf.Abs(staminaOverTime);
                 staminaBarChangeFG.color = Color.Lerp(Color.white, staminaWarnColor, colorLerp);
                 staminaBarChangeFG.fillAmount = Mathf.Min(stamina, Mathf.Abs(staminaOverTime));
-                staminaBarChangeFG.rectTransform.localPosition = new Vector3(270 * Mathf.Max(0, stamina - Mathf.Abs(staminaOverTime)), 0);
+                staminaBarChangeFG.rectTransform.localPosition = new Vector3(1f + 276f * Mathf.Max(0, stamina - Mathf.Abs(staminaOverTime)) + 0.05f, 0);
 
                 if (Plugin.detailedStamina.Value == StaminaTextOptions.Full)
                     staminaText.text += $" | {staminaPercentOverTime.ToString("0.0")}<size=75%>/sec</size>";
@@ -130,6 +135,10 @@ class CustomHUD_Mono : MonoBehaviour
         // Health
         healthBar.fillAmount = health / 100f;
         healthText.text = health.ToString();
+        if (healthText2 != null)
+        {
+            healthText2.text = health.ToString();
+        }
         float delay = Plugin.healthbarHideDelay.Value;
         healthGroup.alpha = Plugin.autoHideHealthbar.Value ? Mathf.InverseLerp(delay + 1, delay, lastHealthChange) : 1f;
 
@@ -158,7 +167,7 @@ class CustomHUD_Mono : MonoBehaviour
 
         flashlightText.text = $"{Mathf.CeilToInt(heldItem.insertedBattery.charge * 100)}%";
 
-        if (Plugin.displayTimeLeft.Value)
+        if (!Plugin.displayTimeLeft.Value)
             return true;
 
         flashlightText.text += $" <size=60%>{useTimeRemaining / 60}:{(useTimeRemaining % 60).ToString("D2")}";

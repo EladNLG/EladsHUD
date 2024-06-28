@@ -11,6 +11,13 @@ Objectively.
 
 # Patch Notes
 
+## 1.3
+
+- Fixed most of the aliasing whilst using this HUD.
+- Fixed planetary info not showing up. For the REAL eladshud fans, this is toggleable in the config.
+- The unity project is now open-source.
+- Added a border around the healthbar.
+
 ## 1.2
 
 - no longer overloaded with information
